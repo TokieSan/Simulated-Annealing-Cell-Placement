@@ -104,6 +104,9 @@ int main(int argc, char *argv[]) {
     double T_fin = 5e-6 * initial_cost / (double) num_nets;
     
     int num_moves = 20 * num_cells;
+
+    int runs = 0;
+    unordered_map<int,int> mp;
     while (T_cur > T_fin) {
         int ctr = num_moves;
         while (ctr--) {
@@ -117,12 +120,12 @@ int main(int argc, char *argv[]) {
                 continue;
             }
 
-            vector<int> to_br;
-            for (auto &u : cell_to_nets[U]) to_br.push_back(u);
-            if (~V) for (auto &u : cell_to_nets[V]) to_br.push_back(u);
+            //vector<int> to_br;
+            //for (auto &u : cell_to_nets[U]) to_br.push_back(u);
+            //if (~V) for (auto &u : cell_to_nets[V]) to_br.push_back(u);
 
-            sort(to_br.begin(), to_br.end());
-            to_br.erase(unique(to_br.begin(), to_br.end()), to_br.end());
+            //sort(to_br.begin(), to_br.end());
+            //to_br.erase(unique(to_br.begin(), to_br.end()), to_br.end());
 
             int new_cost = cur_cost;
             
@@ -136,22 +139,40 @@ int main(int argc, char *argv[]) {
             else placement[U] = make_pair(Vx, Vy);
 
 
-            vector<int> temp_net_len(to_br.size());
-            for (int i = 0; i < to_br.size(); i++) {
-                new_cost -= net_len[to_br[i]];
-                temp_net_len[i] = calc_cost(to_br[i]);
-                new_cost += temp_net_len[i];
+            for (auto &u : cell_to_nets[U]){
+                new_cost -= net_len[u];
+                new_cost += calc_cost(u);
+                mp[u] = runs;
+            }
+
+            if (V != -1) {
+                for (auto &u : cell_to_nets[V]) if(mp[u] != runs) {
+                    new_cost -= net_len[u];
+                    new_cost += calc_cost(u);
+                }
             }
                 
             double rej_prop = 1 - exp(-(new_cost - cur_cost) / T_cur);
             if (new_cost >= cur_cost && do_i_do(rej_prop) ) {
                 swap(grid[Vx][Vy], grid[placement[U].first][placement[U].second]);
+                // swap placements if nonempty, if has empty don't swap
                 if (V != -1) swap(placement[U], placement[V]);
                 else placement[U] = make_pair(Vx, Vy);
             } else {
+                runs++;
                 cur_cost = new_cost;
-                for (int i = 0; i < to_br.size(); i++) net_len[to_br[i]] = temp_net_len[i];
+                for (auto &u : cell_to_nets[U]){
+                    net_len[u] = calc_cost(u);
+                    mp[u] = runs;
+                }
+
+                if (V != -1) {
+                    for (auto &u : cell_to_nets[V]) if(mp[u] != runs) {
+                        net_len[u] = calc_cost(u);
+                    }
+                }
             }
+            runs++;
         }
         T_cur *= cooling_rate;
     }
