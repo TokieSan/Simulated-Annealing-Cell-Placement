@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
-#pragma once
-
+#pragma GCC optimize("O3,unroll-loops")
+#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+    
 using namespace std;
 
 vector<vector<int>> grid;
@@ -41,11 +42,10 @@ void print_placement(int cost = initial_cost) {
     cout << "CUR COST: " << cost << '\n';
 }
 
+default_random_engine rd{static_cast<long unsigned int>(97)};
+std::mt19937 gen(rd());
+uniform_real_distribution<> dis(0.0, 1.0);
 bool do_i_do(double probability) {
-    // Create a uniform distribution between 0 and 1
-    std::mt19937 gen(rand());
-    uniform_real_distribution<> dis(0.0, 1.0);
-
     return (dis(gen) < probability);
 }
 int main(int argc, char *argv[]) {
@@ -73,16 +73,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    srand(97);
-
     // i-th position = placement
     placement = vector<pair<int,int>>(num_cells);
 
     int idx = 0;
     for (auto &u : placement) {
-        u.first = rand() % ny, u.second = rand() % nx;
+        u.first = gen() % ny, u.second = gen() % nx;
         while(grid[u.first][u.second] != -1) {
-            u.first = rand() % ny, u.second = rand() % nx;
+            u.first = gen() % ny, u.second = gen() % nx;
         }
         grid[u.first][u.second] = idx++;
     }
@@ -109,8 +107,8 @@ int main(int argc, char *argv[]) {
     while (T_cur > T_fin) {
         int ctr = num_moves;
         while (ctr--) {
-            int U = rand() % num_cells;
-            int Vx = rand() % ny, Vy = rand() % nx;
+            int U = gen() % num_cells;
+            int Vx = gen() % ny, Vy = gen() % nx;
             int V = grid[Vx][Vy];
 
             if (Vx == placement[U].first && Vy == placement[U].second) {
@@ -151,7 +149,6 @@ int main(int argc, char *argv[]) {
                 if (V != -1) swap(placement[U], placement[V]);
                 else placement[U] = make_pair(Vx, Vy);
             } else {
-                //cout << "ACCEDPTECD STH\n";
                 cur_cost = new_cost;
                 for (int i = 0; i < to_br.size(); i++) net_len[to_br[i]] = temp_net_len[i];
             }
