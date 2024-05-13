@@ -37,7 +37,18 @@ void print_placement(int cost = initial_cost) {
     }
     cout << "COST: " << cost << '\n';
 }
+void print_binary_grid(int cost = initial_cost){
+ for (auto &u : grid) {
+        for (auto &v : u) {
+            //printf("%d ", v);
+            if (v!=-1) cout << 1 << ' ';
+            else cout <<  0 << ' ';
+        }
+        cout << '\n';
+    }
+    cout << "COST: " << cost << '\n';
 
+}
 default_random_engine rd{static_cast<long unsigned int>(1)};
 std::mt19937 gen(rd());
 uniform_real_distribution<> dis(0.0, 1.0);
@@ -157,6 +168,7 @@ int main(int argc, char *argv[]) {
     }
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
+    print_binary_grid(cur_cost);
     cout << "T_cur = " << T_cur << "\n----------------------\n";
 
     return 0;
