@@ -10,11 +10,9 @@ int num_cells, num_nets, ny, nx;
 int initial_cost;
 
 int calc_cost(int idx) { // net's index
-   // assert(idx < net_to_cell.size() && idx >= 0);
     int dist = 0;
 
     auto &cur_n2c = net_to_cell[idx];
-    //assert(cur_n2c.size() > 0);
     int maxx = 0, maxy = 0, minx = INT_MAX, miny = INT_MAX;
 
     for (auto &x : cur_n2c) {
@@ -48,7 +46,12 @@ bool do_i_do(double probability) {
 }
 int main(int argc, char *argv[]) {
     ios::sync_with_stdio(0);
+    if (argc!= 3){
+        cout<<"Enter the file name then the cooling rate\n";
+        return -1;
+    }
     freopen(argv[1], "r", stdin);
+    double cooling_rate = atof(argv[2]);
 
     cin >> num_cells >> num_nets >> ny >> nx;
 
@@ -90,14 +93,13 @@ int main(int argc, char *argv[]) {
     
     cout << "INITIAL PLACEMENT:\n";
     print_placement();
-    cout << "------------------\n";
+    cout << "--------------------------------------------------------------------------------------------------------\n";
 
 
     
     double T_initial = 500 * initial_cost;
     auto T_cur = T_initial;
     auto cur_cost = initial_cost;
-    double cooling_rate = 0.95;
     double T_fin = 5e-6 * initial_cost / (double) num_nets;
     
     int num_moves = 20 * num_cells;
@@ -110,12 +112,8 @@ int main(int argc, char *argv[]) {
             int V = grid[Vx][Vy];
 
             int new_cost = cur_cost;
-            
-            // assert(Vx < grid.size() && Vy < grid[0].size());
-            // assert(U < placement.size());
-            // swap grid cells
+            // swap cells
             swap(grid[Vx][Vy], grid[Ux][Uy]);
-
             // swap placements if nonempty, if has empty don't swap
             if (V != -1) swap(placement[U], placement[V]);
             else placement[U] = make_pair(Vx, Vy);
@@ -157,12 +155,9 @@ int main(int argc, char *argv[]) {
         }
         T_cur *= cooling_rate;
     }
+    cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
     cout << "T_cur = " << T_cur << "\n----------------------\n";
-
-//  for (int i=0; i<num_cells; i++) {
-//         cout << i<<" "<< placement[i].first << " " << placement[i].second << "\n";
-//     }
 
     return 0;
 }
