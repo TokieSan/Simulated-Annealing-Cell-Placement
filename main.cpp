@@ -37,7 +37,7 @@ void print_placement(int cost = initial_cost) {
     }
     cout << "COST: " << cost << '\n';
 }
-void print_binary_grid(int cost = initial_cost){
+void print_binary_grid(){
  for (auto &u : grid) {
         for (auto &v : u) {
             //printf("%d ", v);
@@ -46,7 +46,6 @@ void print_binary_grid(int cost = initial_cost){
         }
         cout << '\n';
     }
-    cout << "COST: " << cost << '\n';
 
 }
 default_random_engine rd{static_cast<long unsigned int>(1)};
@@ -101,9 +100,11 @@ int main(int argc, char *argv[]) {
         initial_cost += net_len[i];
     }
     
-    
+    cout<< "INITIAL INITIAL BINARY:\n";
+     print_binary_grid();
     cout << "INITIAL PLACEMENT:\n";
     print_placement();
+
     cout << "--------------------------------------------------------------------------------------------------------\n";
 
 
@@ -166,10 +167,11 @@ int main(int argc, char *argv[]) {
         }
         T_cur *= cooling_rate;
     }
+    cout << "FINAL PLACEMENT BINARY:\n";
+    print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
-    print_binary_grid(cur_cost);
-    cout << "T_cur = " << T_cur << "\n----------------------\n";
+    cout << "T_final = " << T_cur;
 
     return 0;
 }
