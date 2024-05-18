@@ -56,13 +56,13 @@ bool do_i_do(double probability) {
 }
 int main(int argc, char *argv[]) {
     ios::sync_with_stdio(0);
-    if (argc!= 4){
-        cout<<"Enter the file name, the output log file and then the cooling rate\n";
+    if (argc!= 3){
+        cout<<"Enter the file name, then the cooling rate\n";
         return -1;
     }
     freopen(argv[1], "r", stdin);
-    ofstream outFile(argv[2]);
-    double cooling_rate = atof(argv[3]);
+  //  ofstream outFile(argv[2]);
+    double cooling_rate = atof(argv[2]);
 
     cin >> num_cells >> num_nets >> ny >> nx;
 
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
         initial_cost += net_len[i];
     }
     
-    cout<< "INITIAL INITIAL BINARY:\n";
-     print_binary_grid();
+    // cout<< "INITIAL INITIAL BINARY:\n";
+    //  print_binary_grid();
     cout << "INITIAL PLACEMENT:\n";
     print_placement();
 
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
     
     int num_moves = 20 * num_cells;
     while (T_cur > T_fin) {
-        outFile<<T_cur<<" "<<cur_cost<<endl;
+       // outFile<<T_cur<<" "<<cur_cost<<endl;
         int ctr = num_moves;
         while (ctr--) {
             int U = gen() % num_cells;
@@ -169,10 +169,10 @@ int main(int argc, char *argv[]) {
         }
         T_cur *= cooling_rate;
     }
-    outFile<<T_cur<<" "<<cur_cost<<endl;
+   // outFile<<T_cur<<" "<<cur_cost<<endl;
 
-    cout << "FINAL PLACEMENT BINARY:\n";
-    print_binary_grid();
+    // cout << "FINAL PLACEMENT BINARY:\n";
+    // print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
     cout << "T_final = " << T_cur;
