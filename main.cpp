@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
-    
+
 using namespace std;
 
 vector<vector<int>> grid;
 vector<vector<int>> net_to_cell, cell_to_nets;
-vector<pair<int,int>> placement;
+vector<pair<int, int>> placement;
 vector<int> net_len;
 int num_cells, num_nets, ny, nx;
 int initial_cost;
@@ -30,18 +30,34 @@ void print_placement(int cost = initial_cost) {
     for (auto &u : grid) {
         for (auto &v : u) {
             //printf("%d ", v);
-            if (v!=-1) cout << fixed << setw(3) << v << ' ';
-            else cout << fixed << setw(3) << "--" << ' ';
+            if (v != -1) cout << fixed << setw(4) << v << ' ';
+            else cout << fixed << setw(4) << "--" << ' ';
         }
         cout << '\n';
     }
     cout << "COST: " << cost << '\n';
 }
-void print_binary_grid(){
- for (auto &u : grid) {
+
+void create_step(int step, int cost = initial_cost) {
+    string step_int = to_string(step); 
+    // pad till having 10 digits with zeros
+    while (step_int.size() < 10) step_int = "0" + step_int;
+    string t = "step_" + step_int + ".txt";
+    ofstream out(t);
+    for (auto &u : grid) {
+        for (auto &v : u) {
+            out << fixed << setw(4) << v << ' ';
+        }
+        out << '\n';
+    }
+    out << "COST: " << cost << '\n';
+}
+
+void print_binary_grid() {
+    for (auto &u : grid) {
         for (auto &v : u) {
             //printf("%d ", v);
-            if (v!=-1) cout << 1 << ' ';
+            if (v != -1) cout << 1 << ' ';
             else cout <<  0 << ' ';
         }
         cout << '\n';
@@ -56,25 +72,26 @@ bool do_i_do(double probability) {
 }
 int main(int argc, char *argv[]) {
     ios::sync_with_stdio(0);
-    if (argc!= 3){
-        cout<<"Enter the file name, then the cooling rate\n";
+    if (argc < 3) {
+        cout << "Enter the file name, then the cooling rate, then -s if you want a simulation GIF\n";
         return -1;
     }
     freopen(argv[1], "r", stdin);
-  //  ofstream outFile(argv[2]);
+
+    bool create_gif = (argc == 3 ? 0 : (string(argv[3]) == "-s"));
     double cooling_rate = atof(argv[2]);
 
     cin >> num_cells >> num_nets >> ny >> nx;
 
     net_len = vector<int>(num_nets);
-    
+
     net_to_cell = vector<vector<int>>(num_nets);
     cell_to_nets = vector<vector<int>>(num_cells);
 
     grid = vector<vector<int>>(ny, vector<int>(nx, -1));
 
     for (int i = 0; i < num_nets; i++) {
-        int num_comp; 
+        int num_comp;
         cin >> num_comp;
         for (int j = 0; j < num_comp; j++) {
             int comp;
@@ -85,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     // i-th position = placement
-    placement = vector<pair<int,int>>(num_cells);
+    placement = vector<pair<int, int>>(num_cells);
 
     int idx = 0;
     for (auto &u : placement) {
@@ -100,24 +117,24 @@ int main(int argc, char *argv[]) {
         net_len[i] = calc_cost(i);
         initial_cost += net_len[i];
     }
-    
+
     // cout<< "INITIAL INITIAL BINARY:\n";
     //  print_binary_grid();
+    int step = 0;
     cout << "INITIAL PLACEMENT:\n";
     print_placement();
+    if (create_gif) create_step(step++);
 
     cout << "--------------------------------------------------------------------------------------------------------\n";
 
-
-    
     double T_initial = 500 * initial_cost;
     auto T_cur = T_initial;
     auto cur_cost = initial_cost;
     double T_fin = 5e-6 * initial_cost / (double) num_nets;
-    
+
     int num_moves = 20 * num_cells;
     while (T_cur > T_fin) {
-       // outFile<<T_cur<<" "<<cur_cost<<endl;
+        // outFile<<T_cur<<" "<<cur_cost<<endl;
         int ctr = num_moves;
         while (ctr--) {
             int U = gen() % num_cells;
@@ -133,13 +150,13 @@ int main(int argc, char *argv[]) {
             else placement[U] = make_pair(Vx, Vy);
 
             vector<int> temp_net_len(num_nets, -1);
-            for (auto &u : cell_to_nets[U]){
+            for (auto &u : cell_to_nets[U]) {
                 new_cost -= net_len[u];
                 temp_net_len[u] = calc_cost(u);
                 new_cost += temp_net_len[u];
             }
             if (V != -1) {
-                for (auto &v: cell_to_nets[V]) {
+                for (auto &v : cell_to_nets[V]) {
                     if (temp_net_len[v] != -1)
                         continue;
                     new_cost -= net_len[v];
@@ -147,7 +164,7 @@ int main(int argc, char *argv[]) {
                     new_cost += temp_net_len[v];
                 }
             }
-                
+
             double rej_prop = 1 - exp(-(new_cost - cur_cost) / T_cur);
             if (new_cost >= cur_cost && do_i_do(rej_prop) ) {
                 // Revert (Swap back)
@@ -157,26 +174,33 @@ int main(int argc, char *argv[]) {
             } else {
                 // Swap
                 cur_cost = new_cost;
-                 for (auto &u : cell_to_nets[U]){
+                for (auto &u : cell_to_nets[U]) {
                     net_len[u] = temp_net_len[u];
-                 }
-                   if (V != -1) {
-                for (auto &v: cell_to_nets[V]) {
-                    net_len[v] = temp_net_len[v];
+                }
+                if (V != -1) {
+                    for (auto &v : cell_to_nets[V]) {
+                        net_len[v] = temp_net_len[v];
+                    }
                 }
             }
-            }
         }
+        if (create_gif) create_step(step++, cur_cost);
         T_cur *= cooling_rate;
     }
-   // outFile<<T_cur<<" "<<cur_cost<<endl;
+    // outFile<<T_cur<<" "<<cur_cost<<endl;
 
     // cout << "FINAL PLACEMENT BINARY:\n";
     // print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
     cout << "T_final = " << T_cur;
+    if (create_gif) create_step(step++, cur_cost);
+
+    if (create_gif) {
+        cout << "\nCreating GIF" << endl;
+        system("python3 create_gif.py; ls -1 | grep step_ | xargs rm -rf");
+        cout << "GIF Created & Simulation finished" << endl;
+    }
 
     return 0;
 }
-
