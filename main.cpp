@@ -29,7 +29,7 @@ int calc_cost(int idx) { // net's index
     return (maxx - minx) + (maxy - miny);
 }
 
-void print_placement(int cost = initial_cost) {
+void print_grid(int cost = initial_cost) {
     for (auto &u : grid) {
         for (auto &v : u) {
             //printf("%d ", v);
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
     print_binary_grid();
     int step = 0;
     cout << "INITIAL PLACEMENT:\n";
-    print_placement();
+    print_grid();
     if (create_gif) create_step(step++);
 
     cout << "--------------------------------------------------------------------------------------------------------\n";
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
     cout << "FINAL PLACEMENT BINARY:\n";
     print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
-    print_placement(cur_cost);
+    print_grid(cur_cost);
     cout << "T_final = " << T_cur<<endl;
     if (create_gif) create_step(step++, cur_cost);
 
