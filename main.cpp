@@ -114,8 +114,9 @@ int main(int argc, char *argv[]) {
     }
     freopen(argv[1], "r", stdin);
 
-    bool create_gif = (argc == 3 ? 0 : (string(argv[3]) == "-s"));
     double cooling_rate = atof(argv[2]);
+  //  ofstream outFile(argv[3]);
+    bool create_gif = (argc == 3 ? 0 : (string(argv[3]) == "-s"));
 
     parse_input_and_populate_nets();
     random_plcement();
@@ -201,7 +202,7 @@ int main(int argc, char *argv[]) {
     // print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
-    cout << "T_final = " << T_cur;
+    cout << "T_final = " << T_cur<<endl;
     if (create_gif) create_step(step++, cur_cost);
 
     if (create_gif) {
