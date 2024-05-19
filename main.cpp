@@ -8,6 +8,9 @@ vector<pair<int, int>> placement;
 vector<int> net_len;
 int num_cells, num_nets, ny, nx;
 int initial_cost;
+default_random_engine rd{static_cast<long unsigned int>(1)};
+std::mt19937 gen(rd());
+uniform_real_distribution<> dis(0.0, 1.0);
 
 int calc_cost(int idx) { // net's index
     int dist = 0;
@@ -64,11 +67,44 @@ void print_binary_grid() {
     }
 
 }
-default_random_engine rd{static_cast<long unsigned int>(1)};
-std::mt19937 gen(rd());
-uniform_real_distribution<> dis(0.0, 1.0);
+
 bool do_i_do(double probability) {
     return (dis(gen) < probability);
+}
+
+void parse_input_and_populate_nets(){
+    // parse input and populate the net_to_cell, cell_to_nets
+    cin >> num_cells >> num_nets >> ny >> nx;
+
+
+    net_to_cell = vector<vector<int>>(num_nets);
+    cell_to_nets = vector<vector<int>>(num_cells);
+
+
+    for (int i = 0; i < num_nets; i++) {
+        int num_comp;
+        cin >> num_comp;
+        for (int j = 0; j < num_comp; j++) {
+            int comp;
+            cin >> comp;
+            cell_to_nets[comp].push_back(i);
+            net_to_cell[i].push_back(comp);
+        }
+    }
+}
+void random_plcement(){
+    // randomly place the cells at the beginning and populate the grid
+    grid = vector<vector<int>>(ny, vector<int>(nx, -1));
+    // i-th position = placement
+    placement = vector<pair<int, int>>(num_cells);
+    int idx = 0;
+    for (auto &u : placement) {
+        u.first = gen() % ny, u.second = gen() % nx;
+        while(grid[u.first][u.second] != -1) {
+            u.first = gen() % ny, u.second = gen() % nx;
+        }
+        grid[u.first][u.second] = idx++;
+    }
 }
 int main(int argc, char *argv[]) {
     ios::sync_with_stdio(0);
@@ -81,38 +117,10 @@ int main(int argc, char *argv[]) {
     bool create_gif = (argc == 3 ? 0 : (string(argv[3]) == "-s"));
     double cooling_rate = atof(argv[2]);
 
-    cin >> num_cells >> num_nets >> ny >> nx;
-
+    parse_input_and_populate_nets();
+    random_plcement();
+    // net_len: length of each net
     net_len = vector<int>(num_nets);
-
-    net_to_cell = vector<vector<int>>(num_nets);
-    cell_to_nets = vector<vector<int>>(num_cells);
-
-    grid = vector<vector<int>>(ny, vector<int>(nx, -1));
-
-    for (int i = 0; i < num_nets; i++) {
-        int num_comp;
-        cin >> num_comp;
-        for (int j = 0; j < num_comp; j++) {
-            int comp;
-            cin >> comp;
-            cell_to_nets[comp].push_back(i);
-            net_to_cell[i].push_back(comp);
-        }
-    }
-
-    // i-th position = placement
-    placement = vector<pair<int, int>>(num_cells);
-
-    int idx = 0;
-    for (auto &u : placement) {
-        u.first = gen() % ny, u.second = gen() % nx;
-        while(grid[u.first][u.second] != -1) {
-            u.first = gen() % ny, u.second = gen() % nx;
-        }
-        grid[u.first][u.second] = idx++;
-    }
-
     for (int i = 0; i < num_nets; i++)  {
         net_len[i] = calc_cost(i);
         initial_cost += net_len[i];
