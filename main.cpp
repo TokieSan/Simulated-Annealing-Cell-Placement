@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
         initial_cost += net_len[i];
     }
 
-    // cout<< "INITIAL INITIAL BINARY:\n";
-    //  print_binary_grid();
+    cout<< "INITIAL INITIAL BINARY:\n";
+    print_binary_grid();
     int step = 0;
     cout << "INITIAL PLACEMENT:\n";
     print_placement();
@@ -196,10 +196,9 @@ int main(int argc, char *argv[]) {
         if (create_gif) create_step(step++, cur_cost);
         T_cur *= cooling_rate;
     }
-    // outFile<<T_cur<<" "<<cur_cost<<endl;
 
-    // cout << "FINAL PLACEMENT BINARY:\n";
-    // print_binary_grid();
+    cout << "FINAL PLACEMENT BINARY:\n";
+    print_binary_grid();
     cout << "FINAL PLACEMENT:\n";
     print_placement(cur_cost);
     cout << "T_final = " << T_cur<<endl;
