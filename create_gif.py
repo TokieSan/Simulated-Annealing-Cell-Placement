@@ -1,7 +1,6 @@
 import os
 import glob
 from PIL import Image, ImageDraw, ImageFont
-import imageio
 import re
 
 def read_step_file(file_path):
