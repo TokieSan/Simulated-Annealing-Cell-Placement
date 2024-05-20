@@ -80,7 +80,6 @@ void parse_input_and_populate_nets(){
     net_to_cell = vector<vector<int>>(num_nets);
     cell_to_nets = vector<vector<int>>(num_cells);
 
-
     for (int i = 0; i < num_nets; i++) {
         int num_comp;
         cin >> num_comp;
@@ -116,7 +115,6 @@ int main(int argc, char *argv[]) {
 
     double cooling_rate = atof(argv[2]);
   //  ofstream outFile(argv[3]);
-    bool create_gif = (argc == 3 ? 0 : (string(argv[3]) == "-s"));
 
     parse_input_and_populate_nets();
     random_plcement();
@@ -132,7 +130,6 @@ int main(int argc, char *argv[]) {
     int step = 0;
     cout << "INITIAL PLACEMENT:\n";
     print_grid();
-    if (create_gif) create_step(step++);
 
     cout << "--------------------------------------------------------------------------------------------------------\n";
 
@@ -193,7 +190,6 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        if (create_gif) create_step(step++, cur_cost);
         T_cur *= cooling_rate;
     }
 
@@ -202,13 +198,5 @@ int main(int argc, char *argv[]) {
     cout << "FINAL PLACEMENT:\n";
     print_grid(cur_cost);
     cout << "T_final = " << T_cur<<endl;
-    if (create_gif) create_step(step++, cur_cost);
-
-    if (create_gif) {
-        cout << "\nCreating GIF" << endl;
-        system("python3 create_gif.py; ls -1 | grep step_ | xargs rm -rf");
-        cout << "GIF Created & Simulation finished" << endl;
-    }
-
     return 0;
 }
