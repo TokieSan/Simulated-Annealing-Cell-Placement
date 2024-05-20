@@ -97,11 +97,13 @@ void random_plcement(){
     // i-th position = placement
     placement = vector<pair<int, int>>(num_cells);
     int idx = 0;
+
+    vector<int> all_cells(nx * ny);
+    iota(all_cells.begin(), all_cells.end(), 0);
+    random_shuffle(all_cells.begin(), all_cells.end());
+
     for (auto &u : placement) {
-        u.first = gen() % ny, u.second = gen() % nx;
-        while(grid[u.first][u.second] != -1) {
-            u.first = gen() % ny, u.second = gen() % nx;
-        }
+        u.first = all_cells[idx] % ny, u.second = all_cells[idx] / nx;
         grid[u.first][u.second] = idx++;
     }
 }
